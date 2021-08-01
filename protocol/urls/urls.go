@@ -60,17 +60,17 @@ var httpClient = http.Client{
 func LinkPreviewWhitelist() []Site {
 	return []Site{
 		Site{
-			Title:     "Status",
+			Title:     "Status - test",
 			Address:   "our.status.im",
 			ImageSite: false,
 		},
 		Site{
-			Title:     "YouTube",
+			Title:     "YouTube - test",
 			Address:   "youtube.com",
 			ImageSite: false,
 		},
 		Site{
-			Title:     "YouTube shortener",
+			Title:     "YouTube shortener - test",
 			Address:   "youtu.be",
 			ImageSite: false,
 		},
@@ -80,22 +80,22 @@ func LinkPreviewWhitelist() []Site {
 		// 	ImageSite: true,
 		// },
 		Site{
-			Title:     "GIPHY GIFs shortener",
+			Title:     "GIPHY GIFs shortener - test",
 			Address:   "gph.is",
 			ImageSite: true,
 		},
 		Site{
-			Title:     "GIPHY GIFs",
+			Title:     "GIPHY GIFs - test",
 			Address:   "giphy.com",
 			ImageSite: true,
 		},
 		Site{
-			Title:     "GIPHY GIFs subdomain",
+			Title:     "GIPHY GIFs subdomain - test",
 			Address:   "media.giphy.com",
 			ImageSite: true,
 		},
 		Site{
-			Title:     "GitHub",
+			Title:     "GitHub - test",
 			Address:   "github.com",
 			ImageSite: false,
 		},
