@@ -18,6 +18,12 @@ type YoutubeOembedData struct {
 	ThumbnailURL string `json:"thumbnail_url"`
 }
 
+type TwitterOembedData struct {
+	ProviderName string `json:"provider_name"`
+	AuthorName   string `json:"author_name"`
+	Html         string `json:"html"`
+}
+
 type GiphyOembedData struct {
 	ProviderName string `json:"provider_name"`
 	Title        string `json:"title"`
@@ -50,6 +56,7 @@ type Site struct {
 }
 
 const YoutubeOembedLink = "https://www.youtube.com/oembed?format=json&url=%s"
+const TwitterOembedLink = "https://publish.twitter.com/oembed?url=%s"
 const GiphyOembedLink = "https://giphy.com/services/oembed?url=%s"
 const TenorOembedLink = "https://tenor.com/oembed?url=%s"
 
@@ -60,18 +67,23 @@ var httpClient = http.Client{
 func LinkPreviewWhitelist() []Site {
 	return []Site{
 		Site{
-			Title:     "Status - test",
+			Title:     "Status",
 			Address:   "our.status.im",
 			ImageSite: false,
 		},
 		Site{
-			Title:     "YouTube - test",
+			Title:     "YouTube",
 			Address:   "youtube.com",
 			ImageSite: false,
 		},
 		Site{
-			Title:     "YouTube shortener - test",
+			Title:     "YouTube shortener",
 			Address:   "youtu.be",
+			ImageSite: false,
+		},
+		Site{
+			Title:     "Twitter",
+			Address:   "twitter.com",
 			ImageSite: false,
 		},
 		// Site{
@@ -80,22 +92,22 @@ func LinkPreviewWhitelist() []Site {
 		// 	ImageSite: true,
 		// },
 		Site{
-			Title:     "GIPHY GIFs shortener - test",
+			Title:     "GIPHY GIFs shortener",
 			Address:   "gph.is",
 			ImageSite: true,
 		},
 		Site{
-			Title:     "GIPHY GIFs - test",
+			Title:     "GIPHY GIFs",
 			Address:   "giphy.com",
 			ImageSite: true,
 		},
 		Site{
-			Title:     "GIPHY GIFs subdomain - test",
+			Title:     "GIPHY GIFs subdomain",
 			Address:   "media.giphy.com",
 			ImageSite: true,
 		},
 		Site{
-			Title:     "GitHub - test",
+			Title:     "GitHub",
 			Address:   "github.com",
 			ImageSite: false,
 		},
@@ -144,6 +156,34 @@ func GetYoutubePreviewData(link string) (previewData LinkPreviewData, err error)
 	previewData.Title = oembedData.Title
 	previewData.Site = oembedData.ProviderName
 	previewData.ThumbnailURL = oembedData.ThumbnailURL
+
+	return previewData, nil
+}
+
+func GetTwitterOembed(url string) (data TwitterOembedData, err error) {
+	oembedLink := fmt.Sprintf(TwitterOembedLink, url)
+	jsonBytes, err := GetURLContent(oembedLink)
+	if err != nil {
+		return data, fmt.Errorf("can't get bytes from twitter oembed response on %s link", oembedLink)
+	}
+
+	err = json.Unmarshal(jsonBytes, &data)
+	if err != nil {
+		return data, fmt.Errorf("can't unmarshall json")
+	}
+
+	return data, nil
+}
+
+func GetTwitterPreviewData(link string) (previewData LinkPreviewData, err error) {
+	oembedData, err := GetTwitterOembed(link)
+	if err != nil {
+		return previewData, err
+	}
+
+	previewData.Title = oembedData.AuthorName
+	previewData.Site = oembedData.ProviderName
+	previewData.ThumbnailURL = oembedData.Html
 
 	return previewData, nil
 }
@@ -276,6 +316,8 @@ func GetLinkPreviewData(link string) (previewData LinkPreviewData, err error) {
 		return GetGiphyShortURLPreviewData(link)
 	case "tenor.com":
 		return GetTenorPreviewData(link)
+	case "twitter.com":
+		return GetTwitterPreviewData(link)
 	default:
 		return previewData, fmt.Errorf("link %s isn't whitelisted. Hostname - %s", link, url.Hostname())
 	}
